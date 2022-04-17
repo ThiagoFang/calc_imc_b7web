@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { levels, calculateImc } from './helpers/imc'
-
+import { levels, calculateImc, Level } from './helpers/imc'
+import leftArrowImage from './assets/leftarrow.png'
 import {GridItem} from './components/GridItem'
 import styles from './App.module.css'
 
@@ -8,15 +8,23 @@ const App = () => {
   const [heightField, setHeightField] = useState<number>(0)
   const [weightField, setWeightField] = useState<number>(0)
 
+  const [toShow, setToShow] = useState<Level | null>(null) 
   const [disabled, setDisabled] = useState<boolean>(false)
 
   const handleCalculateButton = () => {
     if(heightField > 0 && weightField > 0) {
-
+      setToShow(calculateImc(heightField, weightField));
       setDisabled(true)
     } else {
       alert('digite todos os valores')
     }
+  }
+
+  const handleBackButton = () => {
+    setToShow(null)
+    setHeightField(0)
+    setWeightField(0)
+    setDisabled(false)
   }
 
   return (
@@ -50,14 +58,25 @@ const App = () => {
               onChange={e => setWeightField(parseFloat(e.target.value))}  
             />
 
-            <button onClick={handleCalculateButton}>Calcular</button>
+            <button disabled={disabled} onClick={handleCalculateButton}>Calcular</button>
           </div>
+
           <div className={styles.rightSide}>
-            <div className={styles.grid}>
-              {levels.map((item, key) => (
-                <GridItem key={key} item={item}/>
-              ))}
-            </div>
+            {!toShow &&
+              <div className={styles.grid}>
+                {levels.map((item, key) => (
+                  <GridItem key={key} item={item}/>
+                ))}
+              </div>
+            }
+            {toShow &&
+              <div className={styles.rightBig}>
+                <div className={styles.rightArrow} onClick={handleBackButton}>
+                  <img src={leftArrowImage} alt="" />
+                </div>
+                <GridItem item={toShow} />
+              </div>
+            }
           </div>
         </section>
     </div>
